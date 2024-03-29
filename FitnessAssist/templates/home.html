@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <!-- Adding Bootstrap for styling the logout button -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <h2>Welcome to FitnessAssist</h2>
+    <p>This is our dashboard.</p>
+    <!-- Logout Link styled as a button -->
+    <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Logout</a>
+</body>
+</html>
