@@ -1,27 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Login</title>
-    <!-- Adding Bootstrap for styling -->
+    <title>Welcome to Fitness Assist</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* CSS for the red navigation bar */
+        .navbar {
+            background-color: red;
+            color: white;
+            padding: 10px 20px; /* Adjust padding as needed */
+        }
+
+        /* CSS to align "Fitness Assist" to the left */
+        .navbar-brand {
+            float: left;
+            margin-left: 20px; /* Adjust margin as needed */
+        }
+
+        /* CSS for the grey box */
+        .login-box {
+            background-color: #f2f2f2;
+            border-radius: 10px;
+            border: 2px solid red; /* Adding red border */
+            padding: 20px;
+            width: 500px; /* Adjust width as needed */
+            margin: 0 auto; /* Centering the box */
+            margin-top: 50px; /* Adjust top margin as needed */
+        }
+    </style>
 </head>
 <body>
-    <h2>Login</h2>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        <ul class="flash-messages">
-        {% for message in messages %}
-          <li>{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %}
-    <form action="{{ url_for('auth.login') }}" method="POST">
-        Username: <input type="text" name="username" required><br>
-        Password: <input type="password" name="password" required><br>
-        <input type="submit" value="Login" class="btn btn-primary">
-    </form>
-    <!-- Sign Up Button -->
-    <a href="{{ url_for('auth.signup') }}" class="btn btn-secondary mt-3">Sign Up</a>
+
+<div class="navbar">
+    <div class="navbar-brand">Fitness Assist</div>
+</div>
+
+<div class="container">
+    <div class="login-box">
+        <h2 style="text-align: center;">Welcome to Fitness Assist</h2>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul class="flash-messages">
+            {% for message in messages %}
+              <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        <form action="{{ url_for('auth.login') }}" method="POST">
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="text-center">
+                <input type="submit" value="Login" class="btn btn-primary">
+            </div>
+        </form>
+        <div class="text-center mt-3">
+            <p>or</p>
+            <a href="{{ url_for('auth.signup') }}" class="btn btn-secondary">Sign Up</a>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
