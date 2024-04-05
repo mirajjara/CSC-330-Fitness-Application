@@ -4,55 +4,74 @@
     <title>Home</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        /* CSS for the red navigation bar */
         .navbar {
             background-color: red;
             color: white;
             padding: 10px 20px;
             display: flex;
-            justify-content: space-between; /* Align items at the edges */
+            justify-content: space-between;
+            align-items: center;
         }
 
-        /* CSS for the navigation links */
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
         .navbar-nav {
             display: flex;
             align-items: center;
         }
 
         .navbar-nav a {
-            margin-left: 20px; /* Add spacing between links */
-            text-decoration: underline; /* Underline the links */
-            color: white; /* Set link color */
+            margin-left: 20px;
+            text-decoration: none;
+            color: white;
         }
 
         .navbar-nav a:hover {
-            color: white; /* Change link color on hover */
-            text-decoration: underline; /* Maintain underline on hover */
+            text-decoration: none;
+            color: white;
         }
 
-        /* CSS for the buttons */
-        .btn-group {
-            margin-top: 20px; /* Add space between navbar and buttons */
-            text-align: center;
+        .btn-my-profile {
+            background-color: red;
+            border-color: red;
         }
 
-        .btn-group button {
-            margin: 0 10px; /* Add space between buttons */
+        .btn-my-profile:hover {
+            background-color: darkred;
+            border-color: darkred;
+        }
+
+        .btn-logout {
+            background-color: darkred;
+            border-color: darkred;
+        }
+
+        .btn-logout:hover {
+            background-color: red;
+            border-color: red;
         }
     </style>
 </head>
+
 <body>
     <nav class="navbar">
         <div class="navbar-brand">Fitness Assist</div>
         <div class="navbar-nav">
-            <a href="{{ url_for('auth.logout') }}" class="btn btn-danger">Logout</a>
+            <a href="{{ url_for('main.profile') }}" class="btn btn-my-profile">My Profile</a>
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-logout">Logout</a>
         </div>
     </nav>
 
-    <div class="btn-group">
-        <button type="button" class="btn btn-primary">Create Workout Plan</button>
-        <button type="button" class="btn btn-primary">Nutrition</button>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <h2>Welcome, {{ current_user.username }}</h2>
+                <p>This is your home page. You can navigate to your profile.</p>
+            </div>
+        </div>
     </div>
-
 </body>
 </html>
