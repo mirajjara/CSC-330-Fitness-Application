@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Profile</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>My Profile</h2>
+        
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('main.profile') }}">
+            {{ form.csrf_token }}
+
+            <div class="form-group">
+                {{ form.name.label(class="form-control-label") }}
+                {{ form.name(class="form-control") }}
+                {% if form.name.errors %}
+                    {% for error in form.name.errors %}
+                        <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.gender.label(class="form-control-label") }}
+                {{ form.gender(class="form-control") }}
+                {% if form.gender.errors %}
+                    {% for error in form.gender.errors %}
+                        <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.age.label(class="form-control-label") }}
+                {{ form.age(class="form-control") }}
+                {% if form.age.errors %}
+                    {% for error in form.age.errors %}
+                        <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    {{ form.height_feet.label(class="form-control-label") }}
+                    {{ form.height_feet(class="form-control") }}
+                    {% if form.height_feet.errors %}
+                        {% for error in form.height_feet.errors %}
+                            <div class="alert alert-danger" role="alert">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ form.height_inches.label(class="form-control-label") }}
+                    {{ form.height_inches(class="form-control") }}
+                    {% if form.height_inches.errors %}
+                        {% for error in form.height_inches.errors %}
+                            <div class="alert alert-danger" role="alert">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form.weight_pounds.label(class="form-control-label") }}
+                {{ form.weight_pounds(class="form-control") }}
+                {% if form.weight_pounds.errors %}
+                    {% for error in form.weight_pounds.errors %}
+                        <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.activity_level.label(class="form-control-label") }}
+                {{ form.activity_level(class="form-control") }}
+                {% if form.activity_level.errors %}
+                    {% for error in form.activity_level.errors %}
+                        <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.goal_type.label(class="form-control-label") }}
+                {{ form.goal_type(class="form-control") }}
+                {% if form.goal_type.errors %}
+                    {% for error in form.goal_type.errors %}
+                        <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary">Save Profile</button>
+        </form>
+        <a href="{{ url_for('main.home') }}" class="btn btn-secondary mt-3">Back</a>
+    </div>
+</body>
+</html>
