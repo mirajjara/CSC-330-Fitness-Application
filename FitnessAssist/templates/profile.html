@@ -1,4 +1,3 @@
-<!-- profile.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,51 +7,101 @@
 <body>
     <div class="container mt-5">
         <h2>My Profile</h2>
+        
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
         <form method="POST" action="{{ url_for('main.profile') }}">
+            {{ form.csrf_token }}
+
             <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ profile.name }}" required>
+                {{ form.name.label(class="form-control-label") }}
+                {{ form.name(class="form-control") }}
+                {% if form.name.errors %}
+                    {% for error in form.name.errors %}
+                        <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
             </div>
+
             <div class="form-group">
-                <label for="gender">Gender:</label>
-                <select class="form-control" id="gender" name="gender" required>
-                    <option value="male" {% if profile.gender == 'male' %} selected {% endif %}>Male</option>
-                    <option value="female" {% if profile.gender == 'female' %} selected {% endif %}>Female</option>
-                </select>
+                {{ form.gender.label(class="form-control-label") }}
+                {{ form.gender(class="form-control") }}
+                {% if form.gender.errors %}
+                    {% for error in form.gender.errors %}
+                        <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
             </div>
+
             <div class="form-group">
-                <label for="age">Age:</label>
-                <input type="number" class="form-control" id="age" name="age" value="{{ profile.age }}" required>
+                {{ form.age.label(class="form-control-label") }}
+                {{ form.age(class="form-control") }}
+                {% if form.age.errors %}
+                    {% for error in form.age.errors %}
+                        <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
             </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    {{ form.height_feet.label(class="form-control-label") }}
+                    {{ form.height_feet(class="form-control") }}
+                    {% if form.height_feet.errors %}
+                        {% for error in form.height_feet.errors %}
+                            <div class="alert alert-danger" role="alert">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="form-group col-md-6">
+                    {{ form.height_inches.label(class="form-control-label") }}
+                    {{ form.height_inches(class="form-control") }}
+                    {% if form.height_inches.errors %}
+                        {% for error in form.height_inches.errors %}
+                            <div class="alert alert-danger" role="alert">{{ error }}</div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+
             <div class="form-group">
-                <label for="height">Height (in cm):</label>
-                <input type="number" class="form-control" id="height" name="height" value="{{ profile.height }}" required>
+                {{ form.weight_pounds.label(class="form-control-label") }}
+                {{ form.weight_pounds(class="form-control") }}
+                {% if form.weight_pounds.errors %}
+                    {% for error in form.weight_pounds.errors %}
+                        <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
             </div>
+
             <div class="form-group">
-                <label for="weight">Weight (in kg):</label>
-                <input type="number" class="form-control" id="weight" name="weight" value="{{ profile.weight }}" required>
+                {{ form.activity_level.label(class="form-control-label") }}
+                {{ form.activity_level(class="form-control") }}
+                {% if form.activity_level.errors %}
+                    {% for error in form.activity_level.errors %}
+                        <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
             </div>
+
             <div class="form-group">
-                <label for="activity_level">Activity Level:</label>
-                <select class="form-control" id="activity_level" name="activity_level" required>
-                    <option value="sedentary" {% if profile.activity_level == 'sedentary' %} selected {% endif %}>Sedentary</option>
-                    <option value="lightly_active" {% if profile.activity_level == 'lightly_active' %} selected {% endif %}>Lightly Active</option>
-                    <option value="moderately_active" {% if profile.activity_level == 'moderately_active' %} selected {% endif %}>Moderately Active</option>
-                    <option value="very_active" {% if profile.activity_level == 'very_active' %} selected {% endif %}>Very Active</option>
-                    <option value="extra_active" {% if profile.activity_level == 'extra_active' %} selected {% endif %}>Extra Active</option>
-                </select>
+                {{ form.goal_type.label(class="form-control-label") }}
+                {{ form.goal_type(class="form-control") }}
+                {% if form.goal_type.errors %}
+                    {% for error in form.goal_type.errors %}
+                        <div class="alert alert-danger" role="alert">{{ error }}</div>
+                    {% endfor %}
+                {% endif %}
             </div>
-            <div class="form-group">
-                <label for="goal_type">Goal Type:</label>
-                <select class="form-control" id="goal_type" name="goal_type" required>
-                    <option value="lose_weight" {% if profile.goal_type == 'lose_weight' %} selected {% endif %}>Lose Weight</option>
-                    <option value="maintain_weight" {% if profile.goal_type == 'maintain_weight' %} selected {% endif %}>Maintain Weight</option>
-                    <option value="gain_muscle" {% if profile.goal_type == 'gain_muscle' %} selected {% endif %}>Gain Muscle</option>
-                </select>
-            </div>
+
             <button type="submit" class="btn btn-primary">Save Profile</button>
         </form>
-        <!-- Back button to navigate back to home page -->
         <a href="{{ url_for('main.home') }}" class="btn btn-secondary mt-3">Back</a>
     </div>
 </body>

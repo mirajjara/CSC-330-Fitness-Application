@@ -1,7 +1,10 @@
 from flask import Flask
-from .extensions import db, login_manager
-from .extensions import db, migrate
+from .extensions import db, login_manager, migrate
+from .models import User
 from .auth import auth as auth_blueprint
+from .routes import main as main_blueprint
+import os
+
 
 def create_app():
     app = Flask(__name__, template_folder='../templates')
