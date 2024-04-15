@@ -1,65 +1,58 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Track My Macros</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        /* Add your custom styles here to ensure they are not removed */
-    </style>
-</head>
-<body>
-    <div class="container mt-5">
-        <h2>Macros Tracking</h2>
-        <!-- Display Flash Messages -->
-        {% for message in get_flashed_messages() %}
-        <div class="alert alert-warning" role="alert">
-            {{ message }}
-        </div>
-        {% endfor %}
-        <!-- Display recommended macros -->
-        <div class="recommended-macros">
-            <h3>Recommended Daily Intake</h3>
-            <p>Calories: {{ recommended_calories | round }}</p>
-            <p>Protein: {{ recommended_macros.protein | round }}g</p>
-            <p>Carbohydrates: {{ recommended_macros.carbohydrates | round }}g</p>
-            <p>Fats: {{ recommended_macros.fats | round }}g</p>
-        </div>
-
-        <form method="POST" action="{{ url_for('main.macros') }}">
-            {{ form.hidden_tag() }}
-            <h3>Today's Intake</h3>
-            <div class="form-group">
-                <label for="calories">Calories:</label>
-                {{ form.calories(class="form-control") }}
-            </div>
-            <div class="form-group">
-                <label for="protein">Protein (g):</label>
-                {{ form.protein(class="form-control") }}
-            </div>
-            <div class="form-group">
-                <label for="carbohydrates">Carbohydrates (g):</label>
-                {{ form.carbohydrates(class="form-control") }}
-            </div>
-            <div class="form-group">
-                <label for="fats">Fats (g):</label>
-                {{ form.fats(class="form-control") }}
-            </div>
-            {{ form.submit(class="btn btn-primary") }}
-        </form>
-
-        <!-- Section to display today's total intake -->
-        <div class="daily-totals">
-            <h3>Today's Total Intake</h3>
-            <p>Calories: {{ daily_totals.calories }}</p>
-            <p>Protein: {{ daily_totals.protein }}g</p>
-            <p>Carbohydrates: {{ daily_totals.carbohydrates }}g</p>
-            <p>Fats: {{ daily_totals.fats }}g</p>
-        </div>
-
-        <a href="{{ url_for('main.reset_macros') }}" class="btn btn-danger">Reset Today's Intake</a>
-        <a href="{{ url_for('main.home') }}" class="btn btn-secondary mt-3">Back</a>
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2 style="text-align: center;">Recommended Nutrition & Tracking</h2>
+    <!-- Display Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-warning" role="alert">
+        {{ message }}
     </div>
-</body>
-</html>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <!-- Display recommended macros -->
+    <div class="recommended-macros">
+        <h3>Recommended Daily Intake</h3>
+        <p>Calories: {{ recommended_calories | round }}</p>
+        <p>Protein: {{ recommended_macros.protein | round }}g</p>
+        <p>Carbohydrates: {{ recommended_macros.carbohydrates | round }}g</p>
+        <p>Fats: {{ recommended_macros.fats | round }}g</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('main.macros') }}">
+        {{ form.hidden_tag() }}
+        <h3>Today's Intake</h3>
+        <div class="form-group">
+            <label for="calories">Calories:</label>
+            {{ form.calories(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="protein">Protein (g):</label>
+            {{ form.protein(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="carbohydrates">Carbohydrates (g):</label>
+            {{ form.carbohydrates(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="fats">Fats (g):</label>
+            {{ form.fats(class="form-control") }}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+
+    <!-- Section to display today's total intake -->
+    <div class="daily-totals">
+        <h3>Today's Total Intake</h3>
+        <p>Calories: {{ daily_totals.calories }}</p>
+        <p>Protein: {{ daily_totals.protein }}g</p>
+        <p>Carbohydrates: {{ daily_totals.carbohydrates }}g</p>
+        <p>Fats: {{ daily_totals.fats }}g</p>
+    </div>
+
+    <a href="{{ url_for('main.reset_macros') }}" class="btn btn-danger">Reset Today's Intake</a>
+    <a href="{{ url_for('main.home') }}" class="btn btn-secondary mt-3">Back</a>
+</div>
+{% endblock %}
