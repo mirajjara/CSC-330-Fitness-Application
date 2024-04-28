@@ -233,48 +233,53 @@ def schedule_dates(start_date, time_frame):
 
 # Define the list of challenges
 challenges = [
-    {"name": "Push-ups", "description": "Do 10 push-ups", "difficulty": "Easy"},
-    {"name": "Squats", "description": "Do 15 squats", "difficulty": "Medium"},
-    {"name": "Plank", "description": "Hold a plank for 30 seconds", "difficulty": "Hard"},
-    {"name": "Burpees", "description": "Do 10 burpees", "difficulty": "Hard"},
-    {"name": "Jumping Jacks", "description": "Do 30 seconds of jumping jacks", "difficulty": "Easy"},
-    {"name": "Mountain Climbers", "description": "Do 30 seconds of mountain climbers", "difficulty": "Medium"},
-    {"name": "Sit-ups", "description": "Do 15 sit-ups", "difficulty": "Medium"},
-    {"name": "Lunges", "description": "Do 15 lunges", "difficulty": "Medium"},
-    {"name": "Dumbbell Rows", "description": "Do 15 dumbbell rows", "difficulty": "Medium"},
-    {"name": "Dumbbell Shoulder Press", "description": "Do 15 dumbbell shoulder presses", "difficulty": "Medium"},
-    {"name": "Bicep Curls", "description": "Do 15 bicep curls", "difficulty": "Easy"},
-    {"name": "Tricep Dips", "description": "Do 15 tricep dips", "difficulty": "Medium"},
-    {"name": "Russian Twists", "description": "Do 15 Russian twists", "difficulty": "Easy"},
-    {"name": "Leg Raises", "description": "Do 15 leg raises", "difficulty": "Easy"},
-    {"name": "Wall Sit", "description": "Do 30 seconds of wall sit", "difficulty": "Medium"},
-    {"name": "Glute Bridges", "description": "Do 15 glute bridges", "difficulty": "Easy"},
-    {"name": "Calf Raises", "description": "Do 15 calf raises", "difficulty": "Easy"}
-]
+            {'name': 'Push Ups I', 'description': 'Get those arms ready for a superhero pose! Complete 10 push ups in one set', 'difficulty': 'Easy'},
+            {'name': 'Push Ups II', 'description': 'Time to level up! Complete 20 push ups in two sets of 10 and show off those guns', 'difficulty': 'Medium'},
+            {'name': 'Push Ups III', 'description': 'The ultimate push up challenge! Complete 30 push ups in three sets of 10 and earn your superhero cape', 'difficulty': 'Hard'},
+            {'name': 'One Mile Run', 'description': 'Ready, set, go! Run one mile without stopping and feel the rush of endorphins', 'difficulty': 'Easy'},
+            {'name': 'Two Mile Run', 'description': 'You\'ve got this! Run two miles without stopping and show off your endurance skills', 'difficulty': 'Medium'},
+            {'name': 'Three Mile Run', 'description': 'The ultimate test of endurance! Run three miles without stopping and earn your marathon badge', 'difficulty': 'Hard'},
+            {'name': 'Sit Ups I', 'description': 'Get ready to crunch! Complete 15 sit ups in one set and strengthen that core', 'difficulty': 'Easy'},
+            {'name': 'Sit Ups II', 'description': 'Time to step it up! Complete 30 sit ups in two sets of 15 and show off your six pack', 'difficulty': 'Medium'},
+            {'name': 'Sit Ups III', 'description': 'The ultimate core challenge! Complete 45 sit ups in three sets of 15 and earn your superhero abs', 'difficulty': 'Hard'},
+            {'name': 'Cycling I', 'description': 'Pedal to the metal! Cycle for 10 minutes without stopping and feel the wind in your hair', 'difficulty': 'Easy'},
+            {'name': 'Cycling II', 'description': 'You\'re on a roll! Cycle for 20 minutes without stopping and show off your cycling skills', 'difficulty': 'Medium'},
+            {'name': 'Cycling III', 'description': 'The ultimate cycling challenge! Cycle for 30 minutes without stopping and earn your cycling badge', 'difficulty': 'Hard'},
+        ]
 
 daily_challenge_cache = {}
-
-@main.route('/daily_fitness_challenge')
-def daily_fitness_challenge():
-    # Get the current date
-    today = datetime.today()
-
-    # Check if the challenge for today is already cached
-    if today not in daily_challenge_cache or daily_challenge_cache[today]['expires'] < datetime.now():
-        # If not, generate a new challenge and cache it
-        challenge = generate_challenge()
-        daily_challenge_cache[today] = {'challenge': challenge, 'expires': datetime(today.year, today.month, today.day, 23, 59, 59)}
-    else:
-        # If it is, retrieve it from the cache
-        challenge = daily_challenge_cache[today]['challenge']
-
-    # Render the template with the challenge
-    return render_template('daily_fitness_challenge.html', challenge=challenge)
 
 def generate_challenge():
     # Select a random challenge from the list
     random_challenge = random.choice(challenges)
     return random_challenge
 
-if __name__ == '__main__':
-    main.run()
+@main.route('/daily_fitness_challenge')
+def daily_fitness_challenge():
+    # Get the current date and time
+    now = datetime.now()
+    today = now.date()
+
+    # Check if the challenge for today is already cached and hasn't expired
+    if today not in daily_challenge_cache or daily_challenge_cache[today]['expires'] < now:
+        # If not, generate a new challenge and cache it
+        challenge = generate_challenge()
+        expires = now.replace(hour=23, minute=59, second=59)  # set expires time to 11:59:59 PM
+        daily_challenge_cache[today] = {'challenge': challenge, 'expires': expires, 'completed': False}
+    else:
+        # If it is, retrieve it from the cache
+        challenge = daily_challenge_cache[today]['challenge']
+        if daily_challenge_cache[today]['completed']:
+            return render_template('already_completed.html')  # Render a template indicating that the challenge has already been completed
+
+    # Render the template with the challenge
+    return render_template('daily_fitness_challenge.html', challenge=challenge)
+
+@main.route('/complete_challenge', methods=['POST'])
+def complete_challenge():
+    today = datetime.today()
+    if daily_challenge_cache[today]['completed']:
+        return "Challenge already completed!"
+    else:
+        daily_challenge_cache[today]['completed'] = True
+        return "Challenge completed successfully!"
