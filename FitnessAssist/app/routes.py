@@ -231,26 +231,50 @@ def schedule_dates(start_date, time_frame):
     else:
         return [start_date]  # Fallback to single date if no time frame matches
 
+# Define the list of challenges
+challenges = [
+    {"name": "Push-ups", "description": "Do 10 push-ups", "difficulty": "Easy"},
+    {"name": "Squats", "description": "Do 15 squats", "difficulty": "Medium"},
+    {"name": "Plank", "description": "Hold a plank for 30 seconds", "difficulty": "Hard"},
+    {"name": "Burpees", "description": "Do 10 burpees", "difficulty": "Hard"},
+    {"name": "Jumping Jacks", "description": "Do 30 seconds of jumping jacks", "difficulty": "Easy"},
+    {"name": "Mountain Climbers", "description": "Do 30 seconds of mountain climbers", "difficulty": "Medium"},
+    {"name": "Sit-ups", "description": "Do 15 sit-ups", "difficulty": "Medium"},
+    {"name": "Lunges", "description": "Do 15 lunges", "difficulty": "Medium"},
+    {"name": "Dumbbell Rows", "description": "Do 15 dumbbell rows", "difficulty": "Medium"},
+    {"name": "Dumbbell Shoulder Press", "description": "Do 15 dumbbell shoulder presses", "difficulty": "Medium"},
+    {"name": "Bicep Curls", "description": "Do 15 bicep curls", "difficulty": "Easy"},
+    {"name": "Tricep Dips", "description": "Do 15 tricep dips", "difficulty": "Medium"},
+    {"name": "Russian Twists", "description": "Do 15 Russian twists", "difficulty": "Easy"},
+    {"name": "Leg Raises", "description": "Do 15 leg raises", "difficulty": "Easy"},
+    {"name": "Wall Sit", "description": "Do 30 seconds of wall sit", "difficulty": "Medium"},
+    {"name": "Glute Bridges", "description": "Do 15 glute bridges", "difficulty": "Easy"},
+    {"name": "Calf Raises", "description": "Do 15 calf raises", "difficulty": "Easy"}
+]
+
+daily_challenge_cache = {}
+
 @main.route('/daily_fitness_challenge')
 def daily_fitness_challenge():
-    # Get the current date and time
-    now = datetime.now()
+    # Get the current date
+    today = datetime.today()
 
-    # Calculate the next challenge date and time (midnight today or tomorrow)
-    next_challenge = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+    # Check if the challenge for today is already cached
+    if today not in daily_challenge_cache or daily_challenge_cache[today]['expires'] < datetime.now():
+        # If not, generate a new challenge and cache it
+        challenge = generate_challenge()
+        daily_challenge_cache[today] = {'challenge': challenge, 'expires': datetime(today.year, today.month, today.day, 23, 59, 59)}
+    else:
+        # If it is, retrieve it from the cache
+        challenge = daily_challenge_cache[today]['challenge']
 
-    # If the next challenge is in the past (i.e., it's already midnight), move to the next day
-    if next_challenge < now:
-        next_challenge += timedelta(days=1)
+    # Render the template with the challenge
+    return render_template('daily_fitness_challenge.html', challenge=challenge)
 
-    # Calculate the countdown time (difference between now and next challenge)
-    countdown = next_challenge - now
-
-    # Get all challenges from the database
-    challenges = Challenge.query.all()
-
-    # Select a random challenge
+def generate_challenge():
+    # Select a random challenge from the list
     random_challenge = random.choice(challenges)
+    return random_challenge
 
-    # Render the template with the random challenge and countdown
-    return render_template('daily_fitness_challenge.html', challenge=random_challenge, countdown=countdown)
+if __name__ == '__main__':
+    main.run()

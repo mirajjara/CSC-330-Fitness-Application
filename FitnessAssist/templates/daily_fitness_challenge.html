@@ -1,15 +1,100 @@
-<h1>Daily Fitness Challenge</h1>
-
-<div>
-	<h2>Today's Challenge:</h2>
-	<p>{{ challenge.name }}</p>
-	<p>{{ challenge.description }}</p>
-	<p>Difficulty: {{ challenge.difficulty }}</p>
-</div>
-
-<div>
-	<h2>Complete Challenge:</h2>
-	<form action="/complete_challenge" method="post">
-		<input type="submit" value="Complete Challenge">
-	</form>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Challenge</title>
+    <style>
+        .challenge-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .timer-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <a href="#" onclick="history.back()">Back to Home</a>
+    <section class="challenge-container">
+        <h1>Today's Challenge</h1>
+        <div class="challenge-info">
+            <h2>Challenge Details:</h2>
+            <p id="challenge-name">{{ challenge.name }}</p>
+            <p id="challenge-description">{{ challenge.description }}</p>
+            <p id="challenge-difficulty">Difficulty: {{ challenge.difficulty }}</p>
+        </div>
+        <div class="complete-challenge">
+            <h2>Complete Challenge:</h2>
+            <button class="complete-btn" id="complete-challenge-btn">Complete Challenge</button>
+        </div>
+    </section>
+    <section class="timer-container">
+        <div id="timer"></div>
+    </section>
+    <script>
+        const completeChallengeBtn = document.getElementById('complete-challenge-btn');
+        completeChallengeBtn.addEventListener('click', () => {
+            // Redirect to home page
+            window.location.href = '/';
+            // Display flash message
+            alert('Congratulations! You completed today\'s challenge!', 'success');
+            // Update user's challenge streak and completed challenges count
+            const userId = '{{ current_user.id }}';
+            const difficulty = '{{ challenge.difficulty }}';
+            fetch(`/update-challenge-status/${userId}/${difficulty}`, {
+                method: 'POST',
+            });
+        });
+    </script>
+    <script>
+        const currentDate = new Date();
+        const storedDate = localStorage.getItem('date');
+        
+        if (storedDate && storedDate === currentDate.toLocaleDateString()) {
+          // Challenge is already up-to-date, do nothing
+        } else {
+          // Update the challenge and store the new date
+          const newChallenge = generateChallenge(); // Replace with your challenge generation logic
+          document.getElementById('challenge-name').textContent = newChallenge.name;
+          document.getElementById('challenge-description').textContent = newChallenge.description;
+          document.getElementById('challenge-difficulty').textContent = newChallenge.difficulty;
+          localStorage.setItem('date', currentDate.toLocaleDateString());
+        }
+      </script>
+      <script>
+        // Get the current time
+        var currentTime = new Date();
+        
+        // Set the target time (midnight)
+        var targetTime = new Date(currentTime.getFullYear(), currentTime.getMonth(), currentTime.getDate() + 1, 0, 0, 0);
+        
+        // Calculate the time difference
+        var timeDifference = targetTime - currentTime;
+        
+        // Update the timer every second
+        setInterval(function() {
+          // Calculate the remaining time
+          var remainingTime = timeDifference - 1000;
+          
+          // Convert the remaining time to hours, minutes, and seconds
+          var hours = Math.floor(remainingTime / 3600000);
+          var minutes = Math.floor((remainingTime % 3600000) / 60000);
+          var seconds = Math.floor((remainingTime % 60000) / 1000);
+          
+          // Display the timer
+          document.getElementById("timer").innerHTML = hours + " hours, " + minutes + " minutes, " + seconds + " seconds";
+          
+          // Decrement the time difference by 1 second
+          timeDifference -= 1000;
+        }, 1000);
+      </script>
+      </body>
+      </html>
