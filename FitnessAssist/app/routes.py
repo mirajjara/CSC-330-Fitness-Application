@@ -5,6 +5,7 @@ from .extensions import db
 from .forms import ProfileForm, MacroTrackingForm
 from .macro_service import GoalSettingService
 from datetime import datetime, date, timedelta
+import random
 
 # Create a Blueprint for the main section of the application.
 main = Blueprint('main', __name__)
@@ -232,5 +233,24 @@ def schedule_dates(start_date, time_frame):
 
 @main.route('/daily_fitness_challenge')
 def daily_fitness_challenge():
-    challenge = Challenge.query.filter_by(start_time=datetime.now()).first()
-    return render_template('daily_fitness_challenge.html', challenge=challenge)
+    # Get the current date and time
+    now = datetime.now()
+
+    # Calculate the next challenge date and time (midnight today or tomorrow)
+    next_challenge = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
+
+    # If the next challenge is in the past (i.e., it's already midnight), move to the next day
+    if next_challenge < now:
+        next_challenge += timedelta(days=1)
+
+    # Calculate the countdown time (difference between now and next challenge)
+    countdown = next_challenge - now
+
+    # Get all challenges from the database
+    challenges = Challenge.query.all()
+
+    # Select a random challenge
+    random_challenge = random.choice(challenges)
+
+    # Render the template with the random challenge and countdown
+    return render_template('daily_fitness_challenge.html', challenge=random_challenge, countdown=countdown)

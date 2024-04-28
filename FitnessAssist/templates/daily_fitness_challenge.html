@@ -1,0 +1,15 @@
+<h1>Daily Fitness Challenge</h1>
+
+<div>
+	<h2>Today's Challenge:</h2>
+	<p>{{ challenge.name }}</p>
+	<p>{{ challenge.description }}</p>
+	<p>Difficulty: {{ challenge.difficulty }}</p>
+</div>
+
+<div>
+	<h2>Complete Challenge:</h2>
+	<form action="/complete_challenge" method="post">
+		<input type="submit" value="Complete Challenge">
+	</form>
+</div>
