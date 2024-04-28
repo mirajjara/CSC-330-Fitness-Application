@@ -2,24 +2,246 @@
 
 {% block content %}
 <div class="container text-center">
-    <h2>Welcome, {{ current_user.username }}</h2>
-    <p>This is your home page. You can navigate to your profile.</p>
+    <div class="top-right">
+        <a href="{{ url_for('main.daily_fitness_challenge') }}" class="btn-fitness-challenge">Fitness Challenge</a>
+    </div>
+    <h2>Welcome to Fitness Assist, {{ current_user.username }}</h2>
+    <p>You can begin your fitness journey by creating a profile!</p>
     <a href="{{ url_for('main.macros') }}" class="btn btn-track-macros">View & Track Recommended Nutrition</a>
     <a href="{{ url_for('main.exercise_plan') }}" class="btn btn-exercise-plan">Exercise Plan</a>
-    
+
+    <!-- Calendar Component -->
+    <div id="calendar-container" class="mt-4">
+        <input type="text" id="calendar" style="display:none;">
+    </div>
+
     <div class="exercise-plans mt-4">
-        <h3>Your Exercise Plans</h3>
-        {% if exercise_plans %}
-            {% for plan in exercise_plans %}
-                <div class="exercise-plan-card">
-                    <p>Exercise: {{ plan.exercise }}</p>
-                    <p>Duration: {{ plan.duration }} minutes</p>
-                    <p>Date: {{ plan.date.strftime('%Y-%m-%d') }}</p>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No exercise plans found. Start adding some!</p>
-        {% endif %}
+        <h3 id="exercise-plans-header">Your Exercise Plans</h3>
+        <div id="plans-container">
+            {% if exercise_plans %}
+                {% for plan in exercise_plans %}
+                    <div class="exercise-plan-card" data-date="{{ plan.date.strftime('%Y-%m-%d') }}" data-plan-id="{{ plan.id }}" style="display:none;">
+                        <div style="position: relative;">
+                            <button onclick="deletePlan(this, event)" style="position: absolute; top: 0; right: 0; border: none; background-color: red; color: white;">X</button>
+                        </div>
+                        <p>Exercise: {{ plan.exercise }}</p>
+                        <p>Duration: {{ plan.duration }} minutes</p>
+                        <p>Date: {{ plan.date.strftime('%Y-%m-%d') }}</p>
+                        <input type="checkbox" class="checkoff" onclick="toggleCompletion(this)">
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No exercise plans found. Start adding some!</p>
+            {% endif %}
+        </div>
     </div>
 </div>
+
+<link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+<style>
+     #calendar-container .flatpickr-calendar {
+        border-radius: 10px !important; /* Keeps the overall calendar corners slightly rounded */
+        transform: scale(2.0, 1.2) !important; /* Adjusts the calendar size */
+        font-size: calc(20px / 2.0) !important; /* Adjusts font size inside the calendar */
+        overflow: hidden !important; /* Ensures nothing overflows the calendar's bounds */
+        margin-top: 70px; /* Adjust as necessary to lower the calendar */
+        margin-left: 390px; /* Adjust as necessary to move the calendar to the right */
+    }
+
+    #exercise-plans-header {
+        margin-top: 80px; /* Add more space above the header */
+        font-size: 20px; /* Optional: Adjust font size for better visibility */
+        text-align: center; /* Ensure it's centered */
+    }
+
+    .flatpickr-day {
+        width: 100px !important; /* Specifies width of the day cells */
+        height: 100px !important; /* Ensures height matches the width, making the cells square */
+        line-height: 24px !important; /* Adjusts line height for content alignment */
+        font-size: calc(16px / 2.0) !important; /* Adjusts the font size for day numbers */
+        display: flex !important;
+        justify-content: center !important;
+        align-items: center !important;
+        padding: 10px !important;
+        border-radius: 0px !important; /* Sets border-radius to 0, making the cells square */
+        overflow: hidden !important; /* Prevents text from spilling out of the day cells */
+    }
+
+    /* Specific rule to hide days from next and previous months */
+    .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay {
+        visibility: hidden !important; /* Hides days from previous and next month */
+    }
+
+    .flatpickr-months {
+        padding: 20px 10px !important; /* Pads the month display area */
+    }
+
+    .flatpickr-prev-month, 
+    .flatpickr-next-month {
+        width: 50px !important; /* Adjusts width of navigation buttons */
+        height: 50px !important; /* Adjusts height of navigation buttons */
+        font-size: calc(20px / 2.0) !important; /* Adjusts the font size of the navigation buttons */
+    }
+
+    .flatpickr-month {
+        font-size: calc(24px / 2.0) !important; /* Adjusts the font size for the month label */
+    }
+
+    .exercise-plan-card {
+        position: relative;
+        top: -7px; /* Pushes the card 30px down from its original position */
+        background-color: #f8f8f8 !important; 
+        border: 1px solid #ccc !important; 
+        border-radius: 8px !important; /* Maintains rounded corners for the exercise plan cards */
+        padding: 15px !important; 
+        margin-bottom: 15px !important; 
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+        width: 90% !important; 
+        margin: 20px auto !important; 
+        transition: background-color 0.3s ease !important;
+    }
+
+    .exercise-plan-card.completed {
+        background-color: #ccffcc !important;
+    }
+
+    .top-right {
+        position: absolute;
+        top: 120px;
+        right: 20px;
+    }
+
+    .btn-fitness-challenge {
+        opacity: 1; /* Add this line */
+        background-color: golden;
+        color: golden;
+        border: none;
+        padding: 15px 30px;
+        font-size: 18px;
+        border-radius: 50%;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin: 20px;
+    }
+    .btn-fitness-challenge:hover {
+        background-color: darker golden; /* adjust to your liking */
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const fp = flatpickr("#calendar", {
+            inline: true,
+            monthSelectorType: 'static',
+            onDayCreate: function(dObj, dStr, fp, dayElem){
+                const date = dayElem.dateObj.toISOString().split('T')[0];
+                const plansForDay = Array.from(document.querySelectorAll('.exercise-plan-card')).filter(el => el.getAttribute('data-date') === date);
+                const deletedPlans = JSON.parse(localStorage.getItem('deletedPlans') || '[]');
+                const planNames = plansForDay.reduce((acc, plan) => {
+                    if (!deletedPlans.includes(plan.getAttribute('data-plan-id'))) {
+                        let exerciseName = plan.querySelector('p:nth-child(2)').innerText.replace("Exercise: ", ""); // Removes "Exercise: " prefix if present
+                        acc.push(exerciseName);
+                    }
+                    return acc;
+                }, []);
+                if (planNames.length) {
+                    let span = document.createElement('span');
+                    span.style.fontSize = '10px';
+                    span.style.position = 'absolute';
+                    span.style.bottom = '5px';
+                    span.textContent = planNames.join(', ');
+                    dayElem.appendChild(span);
+                }
+            },
+            onChange: function(selectedDates, dateStr, instance) {
+                const header = document.getElementById('exercise-plans-header');
+                const dateObj = new Date(selectedDates[0]);
+                header.textContent = 'Your Exercise Plans for ' + dateObj.toLocaleDateString('en-US', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+
+                const plans = document.querySelectorAll('.exercise-plan-card');
+                const deletedPlans = JSON.parse(localStorage.getItem('deletedPlans') || '[]');
+
+                plans.forEach(plan => {
+                    const isDeleted = deletedPlans.includes(plan.getAttribute('data-plan-id'));
+                    plan.style.display = (plan.getAttribute('data-date') === dateStr && !isDeleted) ? 'block' : 'none';
+                    let planId = plan.getAttribute('data-plan-id');
+                    plan.querySelector('.checkoff').checked = localStorage.getItem(planId) === 'true';
+                    if (localStorage.getItem(planId) === 'true') {
+                        plan.classList.add('completed');
+                    } else {
+                        plan.classList.remove('completed');
+                    }
+                });
+            }
+        });
+
+        document.querySelectorAll('.exercise-plan-card').forEach(plan => {
+            let checkbox = plan.querySelector('.checkoff');
+            let planId = plan.getAttribute('data-plan-id');
+            const isDeleted = JSON.parse(localStorage.getItem('deletedPlans') || '[]').includes(planId);
+            checkbox.checked = localStorage.getItem(planId) === 'true' && !isDeleted;
+            if (checkbox.checked) {
+                plan.classList.add('completed');
+            }
+            if (isDeleted) {
+                plan.style.display = 'none';
+            }
+        });
+    });
+
+    function toggleCompletion(checkbox) {
+        var card = checkbox.closest('.exercise-plan-card');
+        var planId = card.getAttribute('data-plan-id');
+        if (checkbox.checked) {
+            card.classList.add('completed');
+            localStorage.setItem(planId, 'true');
+        } else {
+            card.classList.remove('completed');
+            localStorage.setItem(planId, 'false');
+        }
+    }
+
+    function deletePlan(button, event) {
+        event.stopPropagation();  // Prevents the day click event from triggering
+        var card = button.closest('.exercise-plan-card');
+        var planId = card.getAttribute('data-plan-id');
+        var date = card.getAttribute('data-date');
+        card.remove();  // Removes the card from DOM
+        const deletedPlans = JSON.parse(localStorage.getItem('deletedPlans') || '[]');
+        if (!deletedPlans.includes(planId)) {
+            deletedPlans.push(planId);
+            localStorage.setItem('deletedPlans', JSON.stringify(deletedPlans));
+        }
+        // Refresh the content of the day cell in the calendar
+        document.querySelectorAll('.flatpickr-day').forEach(dayElem => {
+            if (dayElem.dateObj.toISOString().split('T')[0] === date) {
+                updateDayContent(dayElem);
+            }
+        });
+    }
+
+    function updateDayContent(dayElem) {
+        const date = dayElem.dateObj.toISOString().split('T')[0];
+        const plansForDay = Array.from(document.querySelectorAll('.exercise-plan-card')).filter(el => el.getAttribute('data-date') === date);
+        const deletedPlans = JSON.parse(localStorage.getItem('deletedPlans') || '[]');
+        // Clear existing content except for the day number
+        while (dayElem.childNodes.length > 1) {
+            dayElem.removeChild(dayElem.lastChild);
+        }
+        // Append each plan's exercise name to the day element, if not deleted
+        plansForDay.forEach(plan => {
+            if (!deletedPlans.includes(plan.getAttribute('data-plan-id'))) {
+                let span = document.createElement('span');
+                span.style.fontSize = '10px'; // Smaller text for the exercise names
+                span.style.position = 'absolute'; // Absolute positioning for overlay
+                span.style.bottom = '5px'; // Position at the bottom of the day cell
+                span.textContent = plan.querySelector('p:nth-child(2)').innerText; // Assuming the second p tag is the exercise name
+                dayElem.appendChild(span);
+            }
+        });
+    }
+</script>
 {% endblock %}

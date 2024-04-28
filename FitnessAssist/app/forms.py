@@ -32,6 +32,7 @@ class ProfileForm(FlaskForm):
     weight_pounds = FloatField('Weight (Pounds)', validators=[DataRequired(message="Weight in pounds is required."), NumberRange(min=0, message="Weight must be a positive number.")])
     activity_level = SelectField('Activity Level', choices=[('sedentary', 'Sedentary'), ('lightly_active', 'Lightly Active'), ('moderately_active', 'Moderately Active'), ('very_active', 'Very Active'), ('extra_active', 'Extra Active')], validators=[DataRequired()])
     goal_type = SelectField('Goal Type', choices=[('lose_weight', 'Lose Weight'), ('maintain_weight', 'Maintain Weight'), ('gain_muscle', 'Gain Muscle')], validators=[DataRequired()])
+    goal_time_frame = SelectField('Goal Time Frame', choices=[('1_week', '1 Week'), ('1_month', '1 Month'), ('1_year', '1 Year')], validators=[DataRequired(message="Goal Time Frame is required.")])  # New field
     submit = SubmitField('Save Profile')  # Button to submit form data
 
 def get_exercises_for_goal(goal_type):

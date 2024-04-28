@@ -1,10 +1,10 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_login import login_required, current_user
-from .models import Profile, MacroEntry, ExercisePlan, Exercise
+from .models import Profile, MacroEntry, ExercisePlan, Exercise, Challenge
 from .extensions import db
 from .forms import ProfileForm, MacroTrackingForm
 from .macro_service import GoalSettingService
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 # Create a Blueprint for the main section of the application.
 main = Blueprint('main', __name__)
@@ -47,13 +47,18 @@ def profile():
 def exercise_plan():
     """Manage and view exercise plans based on user's fitness goal."""
     user_profile = Profile.query.filter_by(user_id=current_user.id).first()
-    if user_profile and user_profile.goal_type:
+    exercises, goal_type, goal_time_frame = [], None, None
+    
+    if user_profile:
         exercises = Exercise.query.filter_by(goal_type=user_profile.goal_type).all()
+        goal_type = user_profile.goal_type
+        goal_time_frame = user_profile.goal_time_frame  # Ensure that goal_time_frame is part of your Profile model
         print("Exercises fetched:", exercises)  # Debug print
     else:
-        exercises = []
         print("No goal_type found, fetching all exercises as fallback.")
-    return render_template('ExercisePlan.html', exercises=exercises)
+
+    return render_template('ExercisePlan.html', exercises=exercises, goal_type=goal_type, goal_time_frame=goal_time_frame)
+
 
 @main.route('/save_exercise_plan', methods=['POST'])
 @login_required
@@ -135,3 +140,97 @@ def reset_macros():
     db.session.commit()
     flash('Today\'s intake has been reset.', 'success')
     return redirect(url_for('main.macros'))
+
+@main.route('/generate-schedule', methods=['POST'])
+@login_required
+def generate_schedule():
+    try:
+        if not request.is_json:
+            return jsonify({'success': False, 'message': 'Request must be in JSON format'}), 400
+
+        data = request.get_json()
+        exercise = data.get('exercise')
+        goal_time_frame = data.get('goalTimeFrame')
+        default_duration = 30  # Assuming a default duration of 30 minutes for all exercises
+
+        if not exercise or not goal_time_frame:
+            return jsonify({'success': False, 'message': 'Exercise and goal time frame are required'}), 400
+
+        def schedule_dates(start_date, time_frame):
+            if time_frame == '1_week':
+                return [start_date + timedelta(days=i) for i in range(7)]
+            elif time_frame == '1_month':
+                return [start_date + timedelta(days=i*7) for i in range(4)]
+            elif time_frame == '1_year':
+                return [start_date + timedelta(days=i*30) for i in range(12)]
+            else:
+                return [start_date]
+
+        start_date = date.today()
+        dates = schedule_dates(start_date, goal_time_frame)
+
+        for schedule_date in dates:
+            new_plan = ExercisePlan(
+                user_id=current_user.id, 
+                exercise=exercise, 
+                duration=default_duration,  # Apply the default duration here
+                date=schedule_date
+            )
+            db.session.add(new_plan)
+
+        db.session.commit()
+        return jsonify({'success': True, 'message': 'Schedule created successfully!'})
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': f'Server error: {str(e)}'}), 500
+
+
+
+@main.route('/save_scheduled_exercise_plan', methods=['POST'])
+@login_required
+def save_scheduled_exercise_plan():
+    """Save multiple exercise plans based on user's goal time frame."""
+    exercise_id = request.form.get('scheduled_exercise')
+    duration = int(request.form.get('scheduled_duration'))
+    start_date = datetime.strptime(request.form.get('start_date'), '%Y-%m-%d').date()
+
+    # Fetch user's goal time frame from the profile
+    user_profile = Profile.query.filter_by(user_id=current_user.id).first()
+    if user_profile:
+        time_frame = user_profile.goal_time_frame
+        dates = schedule_dates(start_date, time_frame)
+        for date in dates:
+            try:
+                new_exercise_plan = ExercisePlan(
+                    user_id=current_user.id,
+                    exercise=exercise_id,
+                    duration=duration,
+                    date=date
+                )
+                db.session.add(new_exercise_plan)
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                flash('Error saving scheduled exercise plans: ' + str(e), 'error')
+                print('Rollback due to:', e)  # Debug print
+    else:
+        flash('No user profile found, cannot schedule exercises.', 'error')
+
+    return redirect(url_for('main.exercise_plan'))
+
+def schedule_dates(start_date, time_frame):
+    """Generate a list of dates for the scheduled exercises based on the time frame."""
+    if time_frame == '1_week':
+        return [start_date + timedelta(days=i) for i in range(7)]
+    elif time_frame == '1_month':
+        return [start_date + timedelta(days=i*7) for i in range(4)]
+    elif time_frame == '1_year':
+        return [start_date + timedelta(days=i*30) for i in range(12)]
+    else:
+        return [start_date]  # Fallback to single date if no time frame matches
+
+@main.route('/daily_fitness_challenge')
+def daily_fitness_challenge():
+    challenge = Challenge.query.filter_by(start_time=datetime.now()).first()
+    return render_template('daily_fitness_challenge.html', challenge=challenge)
