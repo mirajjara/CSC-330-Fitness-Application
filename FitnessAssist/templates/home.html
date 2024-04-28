@@ -112,21 +112,29 @@
     }
 
     .btn-fitness-challenge {
-        opacity: 1; /* Add this line */
-        background-color: golden;
-        color: golden;
-        border: none;
-        padding: 15px 30px;
-        font-size: 18px;
-        border-radius: 50%;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        margin: 20px;
-    }
-    .btn-fitness-challenge:hover {
-        background-color: darker golden; /* adjust to your liking */
-    }
+    opacity: 1;
+    background-color: gold;
+    color: #00008B; /* Dark blue color */
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: bold; /* Adjust according to other buttons' weight */
+    font-family: Arial, sans-serif; /* Ensure this matches the family used by other buttons */
+    border-radius: 50%;
+    cursor: pointer;
+    text-decoration: none; /* This prevents underlining */
+    display: inline-block;
+    margin: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for background and text color */
+}
+
+.btn-fitness-challenge:hover {
+    background-color: #b8860b; /* Darker shade of gold */
+    color: #00008B; /* Keeps the text color dark blue even on hover */
+    text-decoration: none; /* Ensures no underline on hover */
+}
+
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>

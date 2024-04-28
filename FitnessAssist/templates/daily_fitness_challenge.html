@@ -4,7 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fitness Challenge</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            background-color: red;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-brand, .navbar-nav a {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+            background-color: transparent;
+            border: none;
+            margin-left: 20px;
+        }
+        .navbar-nav a:hover {
+            background-color: darkred;
+        }
         .challenge-container {
             max-width: 800px;
             margin: 40px auto;
@@ -22,7 +47,14 @@
     </style>
 </head>
 <body>
-    <a href="#" onclick="history.back()">Back to Home</a>
+    <nav class="navbar">
+        <div class="navbar-brand"><a href="{{ url_for('main.home') }}" style="color: white; text-decoration: none;">Fitness Assist</a></div>
+        <div class="navbar-nav">
+            <a href="{{ url_for('main.profile') }}" class="btn btn-my-profile">My Profile</a>
+            <a href="{{ url_for('auth.logout') }}" class="btn btn-logout">Logout</a>
+        </div>
+    </nav>
+    
     <section class="challenge-container">
         <h1>Today's Challenge</h1>
         <div class="challenge-info">
@@ -53,48 +85,17 @@
                 method: 'POST',
             });
         });
-    </script>
-    <script>
-        const currentDate = new Date();
-        const storedDate = localStorage.getItem('date');
-        
-        if (storedDate && storedDate === currentDate.toLocaleDateString()) {
-          // Challenge is already up-to-date, do nothing
-        } else {
-          // Update the challenge and store the new date
-          const newChallenge = generateChallenge(); // Replace with your challenge generation logic
-          document.getElementById('challenge-name').textContent = newChallenge.name;
-          document.getElementById('challenge-description').textContent = newChallenge.description;
-          document.getElementById('challenge-difficulty').textContent = newChallenge.difficulty;
-          localStorage.setItem('date', currentDate.toLocaleDateString());
-        }
-      </script>
-      <script>
-        // Get the current time
         var currentTime = new Date();
-        
-        // Set the target time (midnight)
         var targetTime = new Date(currentTime.getFullYear(), currentTime.getMonth(), currentTime.getDate() + 1, 0, 0, 0);
-        
-        // Calculate the time difference
         var timeDifference = targetTime - currentTime;
-        
-        // Update the timer every second
         setInterval(function() {
-          // Calculate the remaining time
           var remainingTime = timeDifference - 1000;
-          
-          // Convert the remaining time to hours, minutes, and seconds
           var hours = Math.floor(remainingTime / 3600000);
           var minutes = Math.floor((remainingTime % 3600000) / 60000);
           var seconds = Math.floor((remainingTime % 60000) / 1000);
-          
-          // Display the timer
           document.getElementById("timer").innerHTML = hours + " hours, " + minutes + " minutes, " + seconds + " seconds";
-          
-          // Decrement the time difference by 1 second
           timeDifference -= 1000;
         }, 1000);
-      </script>
-      </body>
-      </html>
+    </script>
+</body>
+</html>
