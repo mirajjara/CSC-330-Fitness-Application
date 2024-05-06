@@ -8,44 +8,202 @@
     <title>Exercise Plan</title>
     <style>
         body { padding-top: 0px; }
-        .container { max-width: 600px; }
+        .container { max-width: 800px; margin-top: 20px; }
+        .exercise-info, .recommended-routine { background: #f8f9fa; border-radius: 5px; padding: 20px; margin-bottom: 30px; }
+        .exercise-info h3, .form-section h2, .recommended-routine h3 { color: red; text-align: center; }
+        .exercise-info h4, .recommended-routine h4 { color: #343a40; }
+        .form-section { padding: 20px; background: #e9ecef; border-radius: 5px; }
+        label { font-weight: bold; }
+        .form-control { margin-bottom: 10px; }
+        .btn-primary { background-color: #007bff; border-color: #007bff; }
+        .generate-schedule button { margin-right: 10px; }
+        .learn-more-link {
+            color: #00008B; /* Dark blue */
+            text-decoration: none; /* No underline */
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2 class="mb-4">Exercise Plan</h2>
-
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-info">{{ message }}</div>
-            {% endfor %}
+        <!-- Exercise Descriptions Based on goal_type -->
+        {% if goal_type == 'gain_muscle' %}
+            <div class="exercise-info">
+                <h3>Key Exercises for Muscle Gain</h3>
+                <h4>Deadlifts</h4>
+                <p>Deadlifts are a powerful compound exercise that targets the lower back, glutes, hamstrings, and traps. <a href="https://www.youtube.com/watch?v=XxWcirHIwVo" class="learn-more-link" target="_blank">Learn more</a></p>
+                <h4>Squats</h4>
+                <p>Squats are fundamental for developing leg and core strength. <a href="https://www.youtube.com/watch?v=gcNh17Ckjgg" class="learn-more-link" target="_blank">Learn more</a></p>
+                <h4>Bench Press</h4>
+                <p>The bench press is key for developing upper body strength, targeting the chest, shoulders, and triceps. <a href="https://www.youtube.com/watch?v=4Y2ZdHCOXok" class="learn-more-link" target="_blank">Learn more</a></p>
+            </div>
+        {% elif goal_type == 'lose_weight' %}
+            <div class="exercise-info">
+                <h3>Key Exercises for Weight Loss</h3>
+                <h4>Running</h4>
+                <p>Running is an effective cardiovascular exercise that burns calories quickly. <a href="https://www.youtube.com/watch?v=K6I24WgiiPw" class="learn-more-link" target="_blank">Learn more</a></p>
+                <h4>Swimming</h4>
+                <p>Swimming provides a full-body workout, improving flexibility and strength. <a href="https://www.youtube.com/watch?v=nlGsZTsZaFc" class="learn-more-link" target="_blank">Learn more</a></p>
+                <h4>Cycling</h4>
+                <p>Cycling is effective for burning calories and building endurance in the lower body. <a href="https://www.youtube.com/watch?v=jhPqTyejY_0" class="learn-more-link" target="_blank">Learn more</a></p>
+            </div>
+        {% elif goal_type == 'maintain_weight' %}
+            <div class="exercise-info">
+                <h3>Key Exercises for Maintaining Weight</h3>
+                <h4>Yoga</h4>
+                <p>Yoga improves flexibility, balance, and strength, aiding in muscle toning. <a href="https://www.youtube.com/watch?v=149Iac5fmoE" class="learn-more-link" target="_blank">Learn more</a></p>
+                <h4>Sports</h4>
+                <p>Engaging in sports like soccer or tennis provides cardiovascular and strength training. <a href="https://www.globality-health.com/health-tips/ten-healthy-sports/" class="learn-more-link" target="_blank">Learn more</a></p>
+                <h4>Walking</h4>
+                <p>Walking is a low impact, effective exercise for maintaining weight. <a href="https://www.youtube.com/watch?v=786B8jCL4lw" class="learn-more-link" target="_blank">Learn more</a></p>
+            </div>
         {% endif %}
-        {% endwith %}
 
-        <form action="{{ url_for('main.save_exercise_plan') }}" method="POST">
-            <div class="form-group">
-                <label for="exercise">Exercise:</label>
-                <select class="form-control" id="exercise" name="exercise">
-                    {% for exercise in exercises %}
-                        <option value="{{ exercise.id }}">{{ exercise.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="duration">Duration (minutes):</label>
-                <input type="number" class="form-control" id="duration" name="duration" required>
-            </div>
-            <div class="form-group">
-                <label for="date">Date:</label>
-                <input type="date" class="form-control" id="date" name="date" required>
-            </div>
-            <button type="submit" class="btn btn-primary">Save</button>
-        </form>
+        <!-- Add Exercise Plan Form -->
+        <div class="form-section">
+            <h2>Add to Your Exercise Plan</h2>
+            <form action="{{ url_for('main.save_exercise_plan') }}" method="POST">
+                <div class="form-group">
+                    <label for="exercise">Exercise:</label>
+                    <select class="form-control" id="exercise" name="exercise">
+                        {% for exercise in exercises %}
+                            <option value="{{ exercise.id }}">{{ exercise.name }}</option>
+                        {% endfor %}
+                    </select
+                </div>
+                <div class="form-group">
+                    <label for="duration">Duration (minutes):</label>
+                    <input type="number" class="form-control" id="duration" name="duration" required>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date:</label>
+                    <input type="date" class="form-control" id="date" name="date" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+
+        <!-- New Form to Schedule Exercise Plans Over Multiple Dates -->
+        <div class="form-section">
+            <h2>Schedule Your Exercise Plan</h2>
+            <form action="{{ url_for('main.save_scheduled_exercise_plan') }}" method="POST">
+                <div class="form-group">
+                    <label for="scheduled_exercise">Exercise:</label>
+                    <select class="form-control" id="scheduled_exercise" name="scheduled_exercise">
+                        {% for exercise in exercises %}
+                            <option value="{{ exercise.id }}">{{ exercise.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="scheduled_duration">Duration (minutes):</label>
+                    <input type="number" class="form-control" id="scheduled_duration" name="scheduled_duration" required>
+                </div>
+                <div class="form-group">
+                    <label for="start_date">Start Date:</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Schedule</button>
+            </form>
+        </div>
+
+
+        <!-- Recommended Routine Section -->
+        <div class="recommended-routine">
+            <h3>Recommended Routine</h3>
+            {% if goal_type == 'gain_muscle' %}
+                <p>Routines for Muscle Gain:</p>
+                <ul>
+                    {% if goal_time_frame == '1_week' %}
+                        <li><strong>Deadlifts:</strong> Monday, Wednesday, Friday (45 minutes per session)</li>
+                        <li><strong>Squats:</strong> Tuesday, Thursday, Saturday (30 minutes per session)</li>
+                        <li><strong>Bench Press:</strong> Monday, Wednesday, Friday (40 minutes per session)</li>
+                    {% elif goal_time_frame == '1_month' %}
+                        <li><strong>Deadlifts:</strong> Every Monday (60 minutes per session)</li>
+                        <li><strong>Squats:</strong> Every Wednesday (60 minutes per session)</li>
+                        <li><strong>Bench Press:</strong> Every Friday (60 minutes per session)</li>
+                    {% elif goal_time_frame == '1_year' %}
+                        <li><strong>Deadlifts:</strong> Every Month (60 minutes per session)</li>
+                        <li><strong>Squats:</strong> Every Month (60 minutes per session)</li>
+                        <li><strong>Bench Press:</strong> Every Month (60 minutes per session)</li>
+                    {% endif %}
+                </ul>
+            {% elif goal_type == 'lose_weight' %}
+                <p>Routines for Weight Loss:</p>
+                <ul>
+                    {% if goal_time_frame == '1_week' %}
+                        <li><strong>Running:</strong> Daily (30 minutes per session)</li>
+                        <li><strong>Swimming:</strong> Daily (45 minutes per session)</li>
+                        <li><strong>Cycling:</strong> Daily (60 minutes per session)</li>
+                    {% elif goal_time_frame == '1_month' %}
+                        <li><strong>Running:</strong> Every Monday (45 minutes per session)</li>
+                        <li><strong>Swimming:</strong> Every Wednesday (60 minutes per session)</li>
+                        <li><strong>Cycling:</strong> Every Friday (90 minutes per session)</li>
+                    {% elif goal_time_frame == '1_year' %}
+                        <li><strong>Running:</strong> Every Month (45 minutes per session)</li>
+                        <li><strong>Swimming:</strong> Every Month (60 minutes per session)</li>
+                        <li><strong>Cycling:</strong> Every Month (90 minutes per session)</li>
+                    {% endif %}
+                </ul>
+            {% elif goal_type == 'maintain_weight' %}
+                <p>Routines for Maintaining Weight:</p>
+                <ul>
+                    {% if goal_time_frame == '1_week' %}
+                        <li><strong>Yoga:</strong> Daily (30 minutes per session)</li>
+                        <li><strong>Sports:</strong> Daily (60 minutes per session)</li>
+                        <li><strong>Walking:</strong> Daily (45 minutes per session)</li>
+                    {% elif goal_time_frame == '1_month' %}
+                        <li><strong>Yoga:</strong> Every Monday (45 minutes per session)</li>
+                        <li><strong>Sports:</strong> Every Wednesday (60 minutes per session)</li>
+                        <li><strong>Walking:</strong> Every Friday (60 minutes per session)</li>
+                    {% elif goal_time_frame == '1_year' %}
+                        <li><strong>Yoga:</strong> Every Month (45 minutes per session)</li>
+                        <li><strong>Sports:</strong> Every Month (60 minutes per session)</li>
+                        <li><strong>Walking:</strong> Every Month (60 minutes per session)</li>
+                    {% endif %}
+                </ul>
+            {% endif %}
+        </div>
     </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const goalType = "{{ goal_type }}"; // Adjust as necessary to dynamically fetch if needed
+        const goalTimeFrame = "{{ goal_time_frame }}"; // This might need to be dynamically fetched as well
+        const exercises = {
+            'gain_muscle': ['Deadlifts', 'Squats', 'Bench Press'],
+            'lose_weight': ['Running', 'Swimming', 'Cycling'],
+            'maintain_weight': ['Yoga', 'Sports', 'Walking']
+        };
+    
+        const scheduleButtonsDiv = document.getElementById('schedule-buttons');
+        exercises[goalType].forEach(function(exercise) {
+            const button = document.createElement('button');
+            button.className = 'btn btn-primary';
+            button.innerText = exercise;
+            button.onclick = function() { generateSchedule(exercise, goalTimeFrame); };
+            scheduleButtonsDiv.appendChild(button);
+        });
+    });
+    
+    function generateSchedule(exercise, goalTimeFrame) {
+        fetch('/generate-schedule', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ exercise, goalTimeFrame })
+        }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Schedule generated successfully!');
+                } else {
+                    alert('Failed to generate schedule.');
+                }
+            });
+    }
+    </script>
+
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap-4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
 {% endblock %}

@@ -95,6 +95,17 @@
             {% endif %}
         </div>
 
+        <!-- New Goal Time Frame Field -->
+        <div class="form-group">
+            {{ form.goal_time_frame.label(class="form-control-label") }}
+            {{ form.goal_time_frame(class="form-control") }}
+            {% if form.goal_time_frame.errors %}
+                {% for error in form.goal_time_frame.errors %}
+                    <div class="alert alert-danger" role="alert">{{ error }}</div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
         <button type="submit" class="btn btn-primary">Save Profile</button>
         <a href="{{ url_for('main.home') }}" class="btn btn-secondary mt-3">Back</a>
     </div>

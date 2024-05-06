@@ -12,6 +12,10 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
     goal_type = db.Column(db.String(50), nullable=True)
+    completed_challenges_easy = db.Column(db.Integer, default=0)
+    completed_challenges_medium = db.Column(db.Integer, default=0)
+    completed_challenges_hard = db.Column(db.Integer, default=0)
+    challenge_streak = db.Column(db.Integer, default=0)
  
 class Profile(db.Model):
     """
@@ -28,6 +32,7 @@ class Profile(db.Model):
     weight_pounds = db.Column(db.Float)
     activity_level = db.Column(db.String(20))
     goal_type = db.Column(db.String(20))
+    goal_time_frame = db.Column(db.String(50))
 
     user = db.relationship('User', backref=db.backref('profile', uselist=False))
 
@@ -86,3 +91,10 @@ class Exercise(db.Model):
     @staticmethod
     def get_exercises_by_goal(goal_type):
         return Exercise.query.filter_by(goal_type=goal_type).all()
+
+class Challenge(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    difficulty = db.Column(db.String(10), nullable=False)  # easy, medium, hard
+    active = db.Column(db.Boolean, default=True)
